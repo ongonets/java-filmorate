@@ -12,47 +12,47 @@ public class UserControllerTest {
     UserController userController = new UserController();
 
     @Test
-    public void validation_shouldValidateByEmail(){
+    public void validation_shouldValidateByEmail() {
         User user = User.builder()
                 .name("Имя")
                 .birthday(LocalDate.of(1990, 12, 20))
                 .login("Логин")
                 .build();
-        Assertions.assertThrows(ValidationException.class, ()-> userController.createUser(user));
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
         User user2 = user.toBuilder()
                 .email("   ")
                 .build();
-        Assertions.assertThrows(ValidationException.class, ()-> userController.createUser(user2));
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user2));
         User user3 = user.toBuilder()
                 .email("examplemail.com")
                 .build();
-        Assertions.assertThrows(ValidationException.class, ()-> userController.createUser(user3));
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user3));
     }
 
     @Test
-    public void validation_shouldValidateByLogin(){
+    public void validation_shouldValidateByLogin() {
         User user = User.builder()
                 .name("Имя")
                 .email("example@mail.com")
                 .birthday(LocalDate.of(1990, 12, 20))
                 .build();
-        Assertions.assertThrows(ValidationException.class, ()-> userController.createUser(user));
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
         User user2 = user.toBuilder()
                 .login("   ")
                 .build();
-        Assertions.assertThrows(ValidationException.class, ()-> userController.createUser(user2));
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user2));
 
     }
 
     @Test
-    public void validation_shouldValidateByBirthday(){
+    public void validation_shouldValidateByBirthday() {
         User user = User.builder()
                 .name("Имя")
                 .email("example@mail.com")
                 .birthday(LocalDate.of(2025, 12, 20))
                 .login("Login")
                 .build();
-        Assertions.assertThrows(ValidationException.class, ()-> userController.createUser(user));
+        Assertions.assertThrows(ValidationException.class, () -> userController.createUser(user));
 
 
     }
