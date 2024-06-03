@@ -38,19 +38,21 @@ public class FilmController {
             throw new ValidationException("Id должен быть указан");
         }
         validateFilm(newFilm);
-        if (films.containsKey(newFilm.getId())) {
-            Film oldFilm = films.get(newFilm.getId());
-            oldFilm = oldFilm.toBuilder()
-                    .name(newFilm.getName())
-                    .description(newFilm.getDescription())
-                    .releaseDate(newFilm.getReleaseDate())
-                    .duration(newFilm.getDuration())
-                    .build();
-            log.info("Обновлен фильм {}", newFilm);
-
-            return oldFilm;
+        if (!films.containsKey(newFilm.getId())) {
+            throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
         }
-        throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
+        Film oldFilm = films.get(newFilm.getId());
+        oldFilm = oldFilm.toBuilder()
+                .name(newFilm.getName())
+                .description(newFilm.getDescription())
+                .releaseDate(newFilm.getReleaseDate())
+                .duration(newFilm.getDuration())
+                .build();
+        log.info("Обновлен фильм {}", newFilm);
+
+        return oldFilm;
+
+
     }
 
     private Film validateFilm(Film film) {
@@ -58,15 +60,17 @@ public class FilmController {
             log.warn("Некорректно введено название фильма {}", film);
             throw new ValidationException("Название фильма некорректно.");
         }
-        if (film.getDescription().toCharArray().length > 200) {
+        if (film.getDescription() == null || film.getDescription().isBlank() ||
+                film.getDescription().toCharArray().length > 200) {
             log.warn("Некорректно введено описание фильма {}", film);
             throw new ValidationException("Описание фильма слишком длинное.");
         }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+        if (film.getReleaseDate() == null ||
+                film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.warn("Некорректно введена дата релиза фильма {}", film);
             throw new ValidationException("Дата релиза фильма некорректна.");
         }
-        if (film.getDuration().isNegative()) {
+        if (film.getDuration() == null || film.getDuration().isNegative()) {
             log.warn("Некорректно введена продолжительность фильма {}", film);
             throw new ValidationException("Продолжительность фильма некорректна.");
         }

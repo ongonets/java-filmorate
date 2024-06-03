@@ -43,18 +43,18 @@ public class UserController {
         }
         validation(newUser);
         if (users.containsKey(newUser.getId())) {
-            User oldUser = users.get(newUser.getId());
-            oldUser = oldUser.toBuilder()
-                    .login(newUser.getLogin())
-                    .email(newUser.getEmail())
-                    .birthday(newUser.getBirthday())
-                    .name(newUser.getName())
-                    .build();
-            log.info("Обновлен пользователь {}", newUser);
-            // если публикация найдена и все условия соблюдены, обновляем её содержимое
-            return oldUser;
+            throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
         }
-        throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
+        User oldUser = users.get(newUser.getId());
+        oldUser = oldUser.toBuilder()
+                .login(newUser.getLogin())
+                .email(newUser.getEmail())
+                .birthday(newUser.getBirthday())
+                .name(newUser.getName())
+                .build();
+        log.info("Обновлен пользователь {}", newUser);
+        return oldUser;
+
     }
 
     private User validation(User user) {
@@ -66,7 +66,7 @@ public class UserController {
             log.warn("Некорректно введен логин у пользователя {}", user);
             throw new ValidationException("Логин указан некоректно");
         }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
+        if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
             log.warn("Некорректно введена дата рождения у пользователя {}", user);
             throw new ValidationException("Дата рождения указана некоректно");
         }
