@@ -42,7 +42,7 @@ public class UserController {
             throw new ValidationException("Id должен быть указан");
         }
         validation(newUser);
-        if (users.containsKey(newUser.getId())) {
+        if (!users.containsKey(newUser.getId())) {
             throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
         }
         User oldUser = users.get(newUser.getId());
