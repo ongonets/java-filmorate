@@ -28,7 +28,7 @@ public class UserService {
         if (user.getName() == null) {
             user.setName(user.getLogin());
         }
-        userStorage.addUser(user);
+        user = userStorage.addUser(user);
         log.info("Добавлен пользователь {}", user);
         return user;
 
