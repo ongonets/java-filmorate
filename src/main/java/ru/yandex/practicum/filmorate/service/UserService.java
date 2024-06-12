@@ -9,12 +9,11 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Optional;
 
 @Service
 @Slf4j
 public class UserService {
-    UserStorage userStorage;
+    private final UserStorage userStorage;
 
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
@@ -40,11 +39,8 @@ public class UserService {
             throw new ValidationException("Id должен быть указан");
         }
         validation(user);
-        Optional<User> userOpt = userStorage.findUser(user.getId());
-        if (userOpt.isEmpty()) {
-            throw new NotFoundException("Пользователь с id = " + user.getId() + " не найден");
-        }
-        User oldUser = userOpt.get();
+        checkId(user.getId());
+        User oldUser = userStorage.findUser(user.getId()).get();
         oldUser = oldUser.toBuilder()
                 .login(user.getLogin())
                 .email(user.getEmail())
@@ -73,4 +69,37 @@ public class UserService {
     }
 
 
+    public void addFriend(long id, long friendId) {
+        checkId(id);
+        checkId(friendId);
+        userStorage.addFriend(id, friendId);
+        userStorage.addFriend(friendId, id);
+        log.info("Пользователь {} добавил в друзья  пользователя {}", id, friendId);
+    }
+
+    public Collection<User> findAllFriend(long id) {
+        checkId(id);
+        return userStorage.findAllfriends(id);
+    }
+
+    public void deleteFriend(long id, long friendId) {
+        checkId(id);
+        checkId(friendId);
+        userStorage.deleteFriend(id, friendId);
+        userStorage.deleteFriend(friendId, id);
+        log.info("Пользователь {} удалил из друзей пользователя {}", id, friendId);
+    }
+
+    public Collection<User> findCommonFriend(long id, long otherId) {
+        checkId(id);
+        checkId(otherId);
+        return userStorage.findCommonfriends(id, otherId);
+    }
+
+    private void checkId(long id) {
+        if (userStorage.findUser(id).isEmpty()) {
+            log.warn("Ползователь с ID {} не найден", id);
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
+    }
 }
