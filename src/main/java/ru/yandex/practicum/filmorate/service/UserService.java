@@ -20,11 +20,13 @@ public class UserService {
     }
 
     public Collection<User> findAllUser() {
+        log.info("Запрос на получение списка  пользователей");
         return userStorage.findAllUser();
     }
 
     public User createUser(User user) {
         validation(user);
+        log.info("Запрос на добавление пользователя {}", user);
         if (user.getName() == null) {
             user.setName(user.getLogin());
         }
@@ -39,6 +41,7 @@ public class UserService {
             throw new ValidationException("Id должен быть указан");
         }
         validation(user);
+        log.info("Запрос на обновление пользователя {}", user);
         checkId(user.getId());
         User oldUser = userStorage.findUser(user.getId()).get();
         oldUser = oldUser.toBuilder()
@@ -72,19 +75,22 @@ public class UserService {
     public void addFriend(long id, long friendId) {
         checkId(id);
         checkId(friendId);
+        log.info("Запрос на добавление в друзья пользователем {} пользователя {}", id, friendId);
         userStorage.addFriend(id, friendId);
         userStorage.addFriend(friendId, id);
-        log.info("Пользователь {} добавил в друзья  пользователя {}", id, friendId);
+        log.info("Пользователь {} добавлен в друзья пользователя {}", id, friendId);
     }
 
     public Collection<User> findAllFriend(long id) {
         checkId(id);
+        log.info("Запрос на получение списка друзей пользователя {}", id);
         return userStorage.findAllfriends(id);
     }
 
     public void deleteFriend(long id, long friendId) {
         checkId(id);
         checkId(friendId);
+        log.info("Запрос на удаление из друзей пользователем {} пользователя {}", id, friendId);
         userStorage.deleteFriend(id, friendId);
         userStorage.deleteFriend(friendId, id);
         log.info("Пользователь {} удалил из друзей пользователя {}", id, friendId);
@@ -93,6 +99,7 @@ public class UserService {
     public Collection<User> findCommonFriend(long id, long otherId) {
         checkId(id);
         checkId(otherId);
+        log.info("Запрос на получение списка общих друзей пользователей {} и {}", id, otherId);
         return userStorage.findCommonfriends(id, otherId);
     }
 

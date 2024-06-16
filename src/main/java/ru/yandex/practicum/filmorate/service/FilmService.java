@@ -20,10 +20,12 @@ public class FilmService {
     private final UserStorage userStorage;
 
     public Collection<Film> findAllFilms() {
+        log.info("Запрос на получение списка  фильмов");
         return filmStorage.findAllFilms();
     }
 
     public Film createFilm(Film film) {
+        log.info("Запрос на добавление фильма {}", film);
         validateFilm(film);
         film = filmStorage.createFilm(film);
         log.info("Добавлен фильм {}", film);
@@ -36,6 +38,7 @@ public class FilmService {
         }
         validateFilm(film);
         checkFilmId(film.getId());
+        log.info("Запрос на обновление фильма {}", film);
         Film oldFilm = filmStorage.findFilm(film.getId()).get();
         oldFilm = oldFilm.toBuilder()
                 .name(film.getName())
@@ -87,6 +90,7 @@ public class FilmService {
     public void addLike(long id, long userId) {
         checkFilmId(id);
         checkUserId(userId);
+        log.info("Запрос на добавление лайка к фильму {} ползователем {}", id, userId);
         filmStorage.addLike(id, userId);
         log.info("Пользователь {} поставил лайк фильму {}", userId, id);
     }
@@ -94,11 +98,13 @@ public class FilmService {
     public void deleteLike(long id, long userId) {
         checkFilmId(id);
         checkUserId(userId);
+        log.info("Запрос на удаление лайка у фильму {} ползователем {}", id, userId);
         filmStorage.deleteLike(id, userId);
         log.info("Пользователь {} удалил лайк у фильма {}", userId, id);
     }
 
     public Collection<Film> findPopularFilms(long count) {
+        log.info("Запрос на получение списка популярных фильмов");
         return filmStorage.findPopularFilms(count);
     }
 }
