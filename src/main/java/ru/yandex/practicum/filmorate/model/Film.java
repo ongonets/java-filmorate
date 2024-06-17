@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.typeadapter.DurationSerializer;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Film.
@@ -27,4 +28,5 @@ public class Film {
     @JsonSerialize(using = DurationSerializer.class)
     @JsonDeserialize(using = DurationDeserializer.class)
     Duration duration;
+    List<Long> likes;
 }
