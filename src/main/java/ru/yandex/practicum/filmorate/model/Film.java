@@ -29,4 +29,6 @@ public class Film {
     @JsonDeserialize(using = DurationDeserializer.class)
     Duration duration;
     List<Long> likes;
+    String mpa;
+    List<String> genre;
 }
