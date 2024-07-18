@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -16,5 +17,5 @@ public class User {
     String name;
     @JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate birthday;
-    Set<Long> friends;
+    Map<Long, String> friends;
 }
