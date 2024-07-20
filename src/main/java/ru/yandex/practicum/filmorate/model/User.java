@@ -17,5 +17,5 @@ public class User {
     String name;
     @JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate birthday;
-    Map<Long, String> friends;
+    Set<Long> friends;
 }
