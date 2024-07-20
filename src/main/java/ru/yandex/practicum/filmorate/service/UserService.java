@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -13,9 +15,13 @@ import java.util.Collection;
 @Service
 @Slf4j
 public class UserService {
+
+
     private final UserStorage userStorage;
 
-    public UserService(UserStorage userStorage) {
+
+
+    public UserService(@Qualifier("userRepository") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -43,16 +49,9 @@ public class UserService {
         validation(user);
         log.info("Запрос на обновление пользователя {}", user);
         checkId(user.getId());
-        User oldUser = userStorage.findUser(user.getId()).get();
-        oldUser = oldUser.toBuilder()
-                .login(user.getLogin())
-                .email(user.getEmail())
-                .birthday(user.getBirthday())
-                .name(user.getName())
-                .build();
-        userStorage.updateUser(oldUser);
+        userStorage.updateUser(user);
         log.info("Обновлен пользователь {}", user);
-        return oldUser;
+        return user;
 
     }
 
