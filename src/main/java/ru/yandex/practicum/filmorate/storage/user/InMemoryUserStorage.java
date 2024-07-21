@@ -47,7 +47,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(long id, long friendId) {
+    public void addFriend(long id, long friendId, long statusID) {
         User user = users.get(id);
         Set<Long> friendSet;
         if (user.getFriends() == null) {
@@ -79,6 +79,11 @@ public class InMemoryUserStorage implements UserStorage {
         }
         friendSet.remove(friendId);
         user.setFriends(friendSet);
+    }
+
+    @Override
+    public void updateFriend(long id, long friendId, long statusId) {
+
     }
 
     @Override

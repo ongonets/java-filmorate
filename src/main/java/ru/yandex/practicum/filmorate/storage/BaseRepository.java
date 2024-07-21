@@ -50,7 +50,8 @@ public class BaseRepository<T> {
             for (int idx = 0; idx < params.length; idx++) {
                 ps.setObject(idx + 1, params[idx]);
             }
-            return ps;}, keyHolder);
+            return ps;
+        }, keyHolder);
 
         Long id = keyHolder.getKeyAs(Long.class);
 
@@ -60,5 +61,17 @@ public class BaseRepository<T> {
         } else {
             throw new InternalServerException("Не удалось сохранить данные");
         }
+    }
+
+
+    protected void add(String query, Object... params) {
+        jdbc.update(connection -> {
+            PreparedStatement ps = connection
+                    .prepareStatement(query);
+            for (int idx = 0; idx < params.length; idx++) {
+                ps.setObject(idx + 1, params[idx]);
+            }
+            return ps;
+        });
     }
 }

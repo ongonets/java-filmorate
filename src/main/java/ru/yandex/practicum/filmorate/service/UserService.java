@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -18,7 +19,6 @@ public class UserService {
 
 
     private final UserStorage userStorage;
-
 
 
     public UserService(@Qualifier("userRepository") UserStorage userStorage) {
@@ -39,7 +39,6 @@ public class UserService {
         user = userStorage.addUser(user);
         log.info("Добавлен пользователь {}", user);
         return user;
-
     }
 
     public User updateUser(User user) {
@@ -52,7 +51,6 @@ public class UserService {
         userStorage.updateUser(user);
         log.info("Обновлен пользователь {}", user);
         return user;
-
     }
 
     private void validation(User user) {
@@ -75,8 +73,13 @@ public class UserService {
         checkId(id);
         checkId(friendId);
         log.info("Запрос на добавление в друзья пользователем {} пользователя {}", id, friendId);
-        userStorage.addFriend(id, friendId);
-        userStorage.addFriend(friendId, id);
+        if (userStorage.findAllfriends(friendId).stream().anyMatch(user -> user.getId() == id)) {
+            userStorage.updateFriend(id, friendId, 1);
+            userStorage.updateFriend(friendId, id, 1);
+        } else {
+            userStorage.addFriend(id, friendId, 1);
+            userStorage.addFriend(friendId, id, 2);
+        }
         log.info("Пользователь {} добавлен в друзья пользователя {}", id, friendId);
     }
 
@@ -90,8 +93,10 @@ public class UserService {
         checkId(id);
         checkId(friendId);
         log.info("Запрос на удаление из друзей пользователем {} пользователя {}", id, friendId);
-        userStorage.deleteFriend(id, friendId);
-        userStorage.deleteFriend(friendId, id);
+        if (userStorage.findAllfriends(id).stream().anyMatch(user -> user.getId() == friendId)) {
+            userStorage.deleteFriend(id, friendId);
+            userStorage.deleteFriend(friendId, id);
+        }
         log.info("Пользователь {} удалил из друзей пользователя {}", id, friendId);
     }
 
