@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.jackson.Jacksonized;
 import ru.yandex.practicum.filmorate.typeadapter.DurationDeserializer;
 import ru.yandex.practicum.filmorate.typeadapter.DurationSerializer;
@@ -17,8 +18,8 @@ import java.util.List;
  * Film.
  */
 @Data
-@Builder(toBuilder = true)
 @Jacksonized
+@EqualsAndHashCode(of = {"id"})
 public class Film {
     long id;
     String name;

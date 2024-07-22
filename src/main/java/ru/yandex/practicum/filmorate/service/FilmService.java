@@ -21,7 +21,7 @@ public class FilmService {
 
     private final UserStorage userStorage;
 
-    public FilmService(FilmStorage filmStorage,  @Qualifier("userRepository") UserStorage userStorage) {
+    public FilmService(@Qualifier("filmRepository") FilmStorage filmStorage,  @Qualifier("userRepository") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -46,16 +46,16 @@ public class FilmService {
         validateFilm(film);
         checkFilmId(film.getId());
         log.info("Запрос на обновление фильма {}", film);
-        Film oldFilm = filmStorage.findFilm(film.getId()).get();
-        oldFilm = oldFilm.toBuilder()
+//        Film oldFilm = filmStorage.findFilm(film.getId()).get();
+        /*oldFilm = oldFilm.toBuilder()
                 .name(film.getName())
                 .description(film.getDescription())
                 .releaseDate(film.getReleaseDate())
                 .duration(film.getDuration())
-                .build();
-        filmStorage.updateFilm(oldFilm);
+                .build();*/
+        filmStorage.updateFilm(film);
         log.info("Обновлен фильм {}", film);
-        return oldFilm;
+        return film;
     }
 
     private void validateFilm(Film film) {
@@ -113,5 +113,13 @@ public class FilmService {
     public Collection<Film> findPopularFilms(long count) {
         log.info("Запрос на получение списка популярных фильмов");
         return filmStorage.findPopularFilms(count);
+    }
+
+    public Film findFilm(long id) {
+        if (filmStorage.findFilm(id).isEmpty()) {
+            log.warn("Фильм с ID {} не найден", id);
+            throw new NotFoundException("Фильм с id = " + id + " не найден");
+        }
+        return filmStorage.findFilm(id).get();
     }
 }
