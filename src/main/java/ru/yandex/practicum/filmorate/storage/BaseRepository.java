@@ -64,14 +64,5 @@ public class BaseRepository<T> {
     }
 
 
-    protected void add(String query, Object... params) {
-        jdbc.update(connection -> {
-            PreparedStatement ps = connection
-                    .prepareStatement(query);
-            for (int idx = 0; idx < params.length; idx++) {
-                ps.setObject(idx + 1, params[idx]);
-            }
-            return ps;
-        });
-    }
+
 }

@@ -1,29 +1,39 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaRepository;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class FilmService {
     private final FilmStorage filmStorage;
-
     private final UserStorage userStorage;
+    private final MpaRepository mpaRepository;
+    private final GenreRepository genreRepository;
 
-    public FilmService(@Qualifier("filmRepository") FilmStorage filmStorage,  @Qualifier("userRepository") UserStorage userStorage) {
+    public FilmService(@Qualifier("filmRepository") FilmStorage filmStorage,
+                       @Qualifier("userRepository") UserStorage userStorage,
+                       MpaRepository mpaRepository,
+                       GenreRepository genreRepository) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.mpaRepository = mpaRepository;
+        this.genreRepository = genreRepository;
     }
 
     public Collection<Film> findAllFilms() {
@@ -46,13 +56,6 @@ public class FilmService {
         validateFilm(film);
         checkFilmId(film.getId());
         log.info("Запрос на обновление фильма {}", film);
-//        Film oldFilm = filmStorage.findFilm(film.getId()).get();
-        /*oldFilm = oldFilm.toBuilder()
-                .name(film.getName())
-                .description(film.getDescription())
-                .releaseDate(film.getReleaseDate())
-                .duration(film.getDuration())
-                .build();*/
         filmStorage.updateFilm(film);
         log.info("Обновлен фильм {}", film);
         return film;
@@ -77,6 +80,20 @@ public class FilmService {
             log.warn("Некорректно введена продолжительность фильма {}", film);
             throw new ValidationException("Продолжительность фильма некорректна.");
         }
+        if (film.getMpa() == null ||
+                mpaRepository.findAllMpa().stream().noneMatch(mpa -> mpa.getId() == film.getMpa().getId())) {
+            log.warn("Некорректно введен рейтинг фильма {}", film);
+            throw new ValidationException("Рейтинг фильма некорректен.");
+        }
+        if (film.getGenres() != null) {
+            Set<Long> genresId = genreRepository.findAllGenre().stream().map(Genre::getId).collect(Collectors.toSet());
+            List<Long> filmsGenresId = film.getGenres().stream().map(Genre::getId).toList();
+            if (!genresId.containsAll(filmsGenresId)) {
+                log.warn("Некорректно введен жанр фильма {}", film);
+                throw new ValidationException("Жанр фильма некорректен.");
+            }
+        }
+
     }
 
     private void checkFilmId(long id) {
