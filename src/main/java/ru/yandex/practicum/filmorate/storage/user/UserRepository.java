@@ -76,7 +76,7 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
 
     @Override
     public void addFriend(long id, long friendId, long statusId) {
-        add(INSERT_FRIEND_QUERY, id, friendId, statusId);
+        update(INSERT_FRIEND_QUERY, id, friendId, statusId);
     }
 
     @Override
