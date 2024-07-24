@@ -17,15 +17,15 @@ import java.util.Optional;
 public class UserRepository extends BaseRepository<User> implements UserStorage {
 
     private static final String INSERT_QUERY = "INSERT INTO users (user_name,email,login,birthday) VALUES (?,?,?,?)";
-    private static final String INSERT_FRIEND_QUERY = "INSERT INTO friends (user_id,friend_id,status_id) " +
+    private static final String INSERT_FRIEND_QUERY = "MERGE INTO friends (user_id,friend_id,status_id) " +
             "VALUES (?,?,?)";
     private static final String FIND_ALL_USERS_QUERY = "SELECT * FROM users";
     private static final String FIND_USER_BY_ID_QUERY = "SELECT * FROM users WHERE user_id = ?";
     private static final String FIND_ALL_FRIENDS_QUERY = "SELECT f.friend_id AS user_id, u.email, u.login, " +
-            "u.user_name, u.birthday FROM friends AS f JOIN users AS u ON f.user_id = u.user_id " +
+            "u.user_name, u.birthday FROM friends AS f JOIN users AS u ON f.friend_id = u.user_id " +
             "WHERE f.user_id = ? AND STATUS_ID = 1";
     private static final String FIND_COMMON_FRIENDS_QUERY = "SELECT f.friend_id AS user_id, u.email, u.login, " +
-            "u.user_name, u.birthday  FROM friends AS f JOIN users AS u ON f.user_id = u.user_id " +
+            "u.user_name, u.birthday  FROM friends AS f JOIN users AS u ON f.friend_id = u.user_id " +
             "WHERE f.user_id= ? AND f.friend_id IN (SELECT friend_id FROM friends WHERE user_id = ?)";
     private static final String UPDATE_QUERY = "UPDATE users SET user_name = ?, email = ?, login = ?, birthday = ?  " +
             "WHERE user_id = ?";

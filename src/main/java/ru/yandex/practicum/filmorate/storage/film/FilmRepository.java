@@ -20,22 +20,14 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
 
     private static final String INSERT_FILM_QUERY = "INSERT INTO films " +
             "(film_name,description,release_date,duration,mpa_id) VALUES (?,?,?,?,?)";
-    private static final String INSERT_FILMS_QUERY = "MERGE INTO film_by_genre (film_id,genre_id) VALUES (?,?)";
+    private static final String GENRE = "MERGE INTO film_by_genre (film_id,genre_id) VALUES (?,?)";
     private static final String INSERT_LIKES_QUERY = "MERGE INTO likes (film_id,user_id) VALUES (?,?)";
     private static final String REMOVE_LIKES_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
     private static final String FIND_ALL_FILMS_QUERY = "SELECT f.*, m.mpa_name, fg.genre_id, g.genre_name " +
             "FROM films f JOIN mpa m ON f.mpa_id  = m.mpa_id  " +
             "LEFT JOIN film_by_genre fg ON f.film_id = fg.film_id " +
             "LEFT JOIN genre g ON fg.genre_id = g.genre_id ORDER BY f.film_id";
-    private static final String FIND_POPULAR_FILMS_QUERY = "SELECT f.*, " +
-            "COUNT (l.user_id) AS count_like , m.mpa_name, fg.genre_id, g.genre_name " +
-            "FROM likes l " +
-            "JOIN films f ON l.film_id = f.film_id " +
-            "JOIN mpa m ON f.mpa_id  = m.mpa_id  " +
-            "LEFT JOIN film_by_genre fg ON f.film_id = fg.film_id " +
-            "LEFT JOIN genre g ON fg.genre_id = g.genre_id " +
-            "GROUP BY l.film_id " +
-            "ORDER BY count_like DESC LIMIT ?";
+    private static final String FIND_POPULAR_FILMS_QUERY = "SELECT fl.* , m.mpa_name, fg.genre_id, g.genre_name FROM (SELECT f.*, COUNT (l.user_id) AS count_like FROM films f  JOIN likes l  ON l.film_id = f.film_id GROUP BY l.film_id ORDER BY count_like DESC LIMIT ?) AS fl JOIN mpa m ON fl.mpa_id  = m.mpa_id  LEFT JOIN film_by_genre fg ON fl.film_id = fg.film_id LEFT JOIN genre g ON fg.genre_id = g.genre_id  ORDER BY count_like DESC;";
     private static final String FIND_FILM_BY_ID_QUERY = "SELECT f.*, m.mpa_name, fg.genre_id, g.genre_name " +
             "FROM films f JOIN mpa m ON f.mpa_id  = m.mpa_id  " +
             "LEFT JOIN film_by_genre fg ON f.film_id = fg.film_id " +
@@ -63,7 +55,7 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
         film.setId(id);
         if (film.getGenres() != null) {
             for (Genre genre : film.getGenres()) {
-                update(INSERT_FILMS_QUERY, film.getId(), genre.getId());
+                update(GENRE, film.getId(), genre.getId());
             }
         }
         return film;
@@ -90,14 +82,14 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
                 film.getName(),
                 film.getDescription(),
                 Timestamp.valueOf(film.getReleaseDate().atStartOfDay()),
-                film.getDuration(),
+                film.getDuration().toMinutes(),
                 film.getMpa().getId(),
                 film.getId()
         );
         update(DELETE_FILMS_QUERY, film.getId());
         if (film.getGenres() != null) {
             for (Genre genre : film.getGenres()) {
-                update(INSERT_FILMS_QUERY, film.getId(), genre.getId());
+                update(GENRE, film.getId(), genre.getId());
             }
         }
         return film;
