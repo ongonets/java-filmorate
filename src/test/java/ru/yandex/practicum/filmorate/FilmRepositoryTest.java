@@ -47,7 +47,7 @@ public class FilmRepositoryTest {
     }
 
     @Test
-    public void TestFindAllFilms() {
+    public void testFindAllFilms() {
         Collection<Film> films = filmRepository.findAllFilms();
         assertThat(films.size() == 2);
 
@@ -60,7 +60,7 @@ public class FilmRepositoryTest {
     }
 
     @Test
-    public void TestCreateFilm() {
+    public void testCreateFilm() {
         Collection<Film> films = filmRepository.findAllFilms();
         assertThat(films.size() == 2);
         assertThat(films.stream().filter(film -> film.getId() == 3).findFirst())
@@ -81,7 +81,7 @@ public class FilmRepositoryTest {
     }
 
     @Test
-    public void TestFindFilm() {
+    public void testFindFilm() {
         Optional<Film> filmOptional = filmRepository.findFilm(1);
         assertThat(filmOptional)
                 .isPresent()
@@ -92,7 +92,7 @@ public class FilmRepositoryTest {
     }
 
     @Test
-    public void TestUpdateFilm() {
+    public void testUpdateFilm() {
         Film film = getFilm();
         film.setId(2);
         Optional<Film> filmOptional = filmRepository.findFilm(2);
@@ -115,7 +115,7 @@ public class FilmRepositoryTest {
     }
 
     @Test
-    public void TestAddLike() {
+    public void testAddLike() {
         Collection<Film> films = filmRepository.findPopularFilms(1);
         assertThat(films.stream().filter(film1 -> film1.getId() == 1).findFirst())
                 .isEmpty();
@@ -133,7 +133,7 @@ public class FilmRepositoryTest {
     }
 
     @Test
-    public void TestDeleteLike() {
+    public void testDeleteLike() {
         Collection<Film> films = filmRepository.findPopularFilms(1);
         assertThat(films.stream().filter(film1 -> film1.getId() == 1).findFirst())
                 .isEmpty();
@@ -151,7 +151,7 @@ public class FilmRepositoryTest {
     }
 
     @Test
-    public void TestFindPopularFilms() {
+    public void testFindPopularFilms() {
         Collection<Film> films = filmRepository.findPopularFilms(1);
         assertThat(films.stream().filter(film1 -> film1.getId() == 1).findFirst())
                 .isEmpty();
