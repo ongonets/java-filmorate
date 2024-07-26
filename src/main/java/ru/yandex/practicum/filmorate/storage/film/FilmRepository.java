@@ -26,10 +26,22 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
     private static final String FIND_ALL_FILMS_QUERY = "SELECT f.*, m.mpa_name, fg.genre_id, g.genre_name " +
             "FROM films f JOIN mpa m ON f.mpa_id  = m.mpa_id  " +
             "LEFT JOIN film_by_genre fg ON f.film_id = fg.film_id " +
-            "LEFT JOIN genre g ON fg.genre_id = g.genre_id ORDER BY f.film_id";
-    private static final String FIND_POPULAR_FILMS_QUERY = "SELECT fl.* , m.mpa_name, fg.genre_id, g.genre_name FROM (SELECT f.*, COUNT (l.user_id) AS count_like FROM films f  JOIN likes l  ON l.film_id = f.film_id GROUP BY l.film_id ORDER BY count_like DESC LIMIT ?) AS fl JOIN mpa m ON fl.mpa_id  = m.mpa_id  LEFT JOIN film_by_genre fg ON fl.film_id = fg.film_id LEFT JOIN genre g ON fg.genre_id = g.genre_id  ORDER BY count_like DESC;";
+            "LEFT JOIN genre g ON fg.genre_id = g.genre_id " +
+            "ORDER BY f.film_id";
+    private static final String FIND_POPULAR_FILMS_QUERY = "SELECT fl.* , m.mpa_name, fg.genre_id, g.genre_name " +
+            "FROM (SELECT f.*, COUNT (l.user_id) AS count_like " +
+            "FROM films f  " +
+            "JOIN likes l  ON l.film_id = f.film_id " +
+            "GROUP BY l.film_id " +
+            "ORDER BY count_like DESC " +
+            "LIMIT ?) AS fl " +
+            "JOIN mpa m ON fl.mpa_id  = m.mpa_id  " +
+            "LEFT JOIN film_by_genre fg ON fl.film_id = fg.film_id " +
+            "LEFT JOIN genre g ON fg.genre_id = g.genre_id  " +
+            "ORDER BY count_like DESC";
     private static final String FIND_FILM_BY_ID_QUERY = "SELECT f.*, m.mpa_name, fg.genre_id, g.genre_name " +
-            "FROM films f JOIN mpa m ON f.mpa_id  = m.mpa_id  " +
+            "FROM films f " +
+            "JOIN mpa m ON f.mpa_id  = m.mpa_id  " +
             "LEFT JOIN film_by_genre fg ON f.film_id = fg.film_id " +
             "LEFT JOIN genre g ON fg.GENRE_ID = g.GENRE_ID WHERE f.film_id = ?";
     private static final String UPDATE_FILM_QUERY = "UPDATE films " +
