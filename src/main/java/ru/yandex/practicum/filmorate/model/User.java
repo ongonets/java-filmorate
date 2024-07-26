@@ -11,10 +11,15 @@ import java.util.Set;
 @NoArgsConstructor
 public class User {
     long id;
+
     String email;
+
     String login;
+
     String name;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate birthday;
+
     Set<Long> friends;
 }

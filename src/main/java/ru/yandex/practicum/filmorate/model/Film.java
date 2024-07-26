@@ -21,14 +21,21 @@ import java.util.List;
 @EqualsAndHashCode(of = {"id"})
 public class Film {
     long id;
+
     String name;
+
     String description;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate releaseDate;
+
     @JsonSerialize(using = DurationSerializer.class)
     @JsonDeserialize(using = DurationDeserializer.class)
     Duration duration;
+
     List<Long> likes;
+
     Mpa mpa;
+
     List<Genre> genres;
 }
