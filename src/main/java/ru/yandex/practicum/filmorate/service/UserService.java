@@ -53,15 +53,15 @@ public class UserService {
 
     private void validation(User user) {
         if (user.getEmail() == null || !(user.getEmail().matches("^(.+)@(\\S+)$"))) {
-            log.warn("Некорректно введен имейл у пользователя {}", user);
+            log.error("Некорректно введен имейл у пользователя {}", user);
             throw new ValidationException("Имейл указан некорректно");
         }
         if (user.getLogin() == null || user.getLogin().isBlank() || !(user.getLogin().matches("^(.+)$"))) {
-            log.warn("Некорректно введен логин у пользователя {}", user);
+            log.error("Некорректно введен логин у пользователя {}", user);
             throw new ValidationException("Логин указан некоректно");
         }
         if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Некорректно введена дата рождения у пользователя {}", user);
+            log.error("Некорректно введена дата рождения у пользователя {}", user);
             throw new ValidationException("Дата рождения указана некоректно");
         }
     }
@@ -71,7 +71,7 @@ public class UserService {
         checkId(id);
         checkId(friendId);
         log.info("Запрос на добавление в друзья пользователем {} пользователя {}", id, friendId);
-        if (userStorage.findAllfriends(friendId).stream().anyMatch(user -> user.getId() == id)) {
+        if (checkFriendship(id, friendId)) {
             userStorage.updateFriend(id, friendId, 1);
             userStorage.updateFriend(friendId, id, 1);
         } else {
@@ -91,7 +91,7 @@ public class UserService {
         checkId(id);
         checkId(friendId);
         log.info("Запрос на удаление из друзей пользователем {} пользователя {}", id, friendId);
-        if (userStorage.findAllfriends(id).stream().anyMatch(user -> user.getId() == friendId)) {
+        if (checkFriendship(friendId, id)) {
             userStorage.deleteFriend(id, friendId);
             userStorage.deleteFriend(friendId, id);
         }
@@ -107,8 +107,12 @@ public class UserService {
 
     private void checkId(long id) {
         if (userStorage.findUser(id).isEmpty()) {
-            log.warn("Ползователь с ID {} не найден", id);
+            log.error("Ползователь с ID {} не найден", id);
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
+    }
+
+    private boolean checkFriendship(long userId, long friendId) {
+        return userStorage.findAllfriends(friendId).stream().anyMatch(user -> user.getId() == userId);
     }
 }
