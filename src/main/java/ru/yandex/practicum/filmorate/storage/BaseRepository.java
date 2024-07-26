@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Slf4j
 public class BaseRepository<T> {
     protected final JdbcTemplate jdbc;
     protected final RowMapper<T> mapper;
@@ -38,6 +40,7 @@ public class BaseRepository<T> {
     protected void update(String query, Object... params) {
         int rowsUpdated = jdbc.update(query, params);
         if (rowsUpdated == 0) {
+            log.error("Не удалось обновить данные");
             throw new InternalServerException("Не удалось обновить данные");
         }
     }
@@ -59,6 +62,7 @@ public class BaseRepository<T> {
         if (id != null) {
             return id;
         } else {
+            log.error("Не удалось сохранить данные");
             throw new InternalServerException("Не удалось сохранить данные");
         }
     }
