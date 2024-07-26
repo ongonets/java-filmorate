@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaRepository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,10 +21,11 @@ public class MpaService {
     }
 
     public Mpa findMpaById(long id) {
-        if (mpaRepository.findMpa(id).isEmpty()) {
-            log.warn("Рейтинг с ID {} не найден", id);
+        Optional<Mpa> mpaOptional = mpaRepository.findMpa(id);
+        if (mpaOptional.isEmpty()) {
+            log.error("Рейтинг с ID {} не найден", id);
             throw new NotFoundException("Рейтинг с id = " + id + " не найден");
         }
-        return mpaRepository.findMpa(id).get();
+        return mpaOptional.get();
     }
 }
