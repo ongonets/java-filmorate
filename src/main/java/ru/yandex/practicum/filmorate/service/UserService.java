@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -13,9 +14,12 @@ import java.util.Collection;
 @Service
 @Slf4j
 public class UserService {
+
+
     private final UserStorage userStorage;
 
-    public UserService(UserStorage userStorage) {
+
+    public UserService(@Qualifier("userRepository") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -33,7 +37,6 @@ public class UserService {
         user = userStorage.addUser(user);
         log.info("Добавлен пользователь {}", user);
         return user;
-
     }
 
     public User updateUser(User user) {
@@ -43,30 +46,22 @@ public class UserService {
         validation(user);
         log.info("Запрос на обновление пользователя {}", user);
         checkId(user.getId());
-        User oldUser = userStorage.findUser(user.getId()).get();
-        oldUser = oldUser.toBuilder()
-                .login(user.getLogin())
-                .email(user.getEmail())
-                .birthday(user.getBirthday())
-                .name(user.getName())
-                .build();
-        userStorage.updateUser(oldUser);
+        userStorage.updateUser(user);
         log.info("Обновлен пользователь {}", user);
-        return oldUser;
-
+        return user;
     }
 
     private void validation(User user) {
         if (user.getEmail() == null || !(user.getEmail().matches("^(.+)@(\\S+)$"))) {
-            log.warn("Некорректно введен имейл у пользователя {}", user);
+            log.error("Некорректно введен имейл у пользователя {}", user);
             throw new ValidationException("Имейл указан некорректно");
         }
         if (user.getLogin() == null || user.getLogin().isBlank() || !(user.getLogin().matches("^(.+)$"))) {
-            log.warn("Некорректно введен логин у пользователя {}", user);
+            log.error("Некорректно введен логин у пользователя {}", user);
             throw new ValidationException("Логин указан некоректно");
         }
         if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Некорректно введена дата рождения у пользователя {}", user);
+            log.error("Некорректно введена дата рождения у пользователя {}", user);
             throw new ValidationException("Дата рождения указана некоректно");
         }
     }
@@ -76,8 +71,13 @@ public class UserService {
         checkId(id);
         checkId(friendId);
         log.info("Запрос на добавление в друзья пользователем {} пользователя {}", id, friendId);
-        userStorage.addFriend(id, friendId);
-        userStorage.addFriend(friendId, id);
+        if (checkFriendship(id, friendId)) {
+            userStorage.updateFriend(id, friendId, 1);
+            userStorage.updateFriend(friendId, id, 1);
+        } else {
+            userStorage.addFriend(id, friendId, 1);
+            userStorage.addFriend(friendId, id, 2);
+        }
         log.info("Пользователь {} добавлен в друзья пользователя {}", id, friendId);
     }
 
@@ -91,8 +91,10 @@ public class UserService {
         checkId(id);
         checkId(friendId);
         log.info("Запрос на удаление из друзей пользователем {} пользователя {}", id, friendId);
-        userStorage.deleteFriend(id, friendId);
-        userStorage.deleteFriend(friendId, id);
+        if (checkFriendship(friendId, id)) {
+            userStorage.deleteFriend(id, friendId);
+            userStorage.deleteFriend(friendId, id);
+        }
         log.info("Пользователь {} удалил из друзей пользователя {}", id, friendId);
     }
 
@@ -105,8 +107,12 @@ public class UserService {
 
     private void checkId(long id) {
         if (userStorage.findUser(id).isEmpty()) {
-            log.warn("Ползователь с ID {} не найден", id);
+            log.error("Ползователь с ID {} не найден", id);
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
+    }
+
+    private boolean checkFriendship(long userId, long friendId) {
+        return userStorage.findAllfriends(friendId).stream().anyMatch(user -> user.getId() == userId);
     }
 }

@@ -14,45 +14,40 @@ public class UserControllerTest {
 
     @Test
     public void validation_shouldValidateByEmail() {
-        User user = User.builder()
-                .name("Имя")
-                .birthday(LocalDate.of(1990, 12, 20))
-                .login("Логин")
-                .build();
+        User user = new User();
+        user.setName("Имя");
+        user.setBirthday(LocalDate.of(1990, 12, 20));
+        user.setLogin("Логин");
+
         Assertions.assertThrows(ValidationException.class, () -> userService.createUser(user));
-        User user2 = user.toBuilder()
-                .email("   ")
-                .build();
+        User user2 = new User();
+        user.setEmail("   ");
         Assertions.assertThrows(ValidationException.class, () -> userService.createUser(user2));
-        User user3 = user.toBuilder()
-                .email("examplemail.com")
-                .build();
+        User user3 = new User();
+        user.setEmail("examplemail.com");
         Assertions.assertThrows(ValidationException.class, () -> userService.createUser(user3));
     }
 
     @Test
     public void validation_shouldValidateByLogin() {
-        User user = User.builder()
-                .name("Имя")
-                .email("example@mail.com")
-                .birthday(LocalDate.of(1990, 12, 20))
-                .build();
+        User user = new User();
+        user.setName("Имя");
+        user.setEmail("example@mail.com");
+        user.setBirthday(LocalDate.of(1990, 12, 20));
         Assertions.assertThrows(ValidationException.class, () -> userService.createUser(user));
-        User user2 = user.toBuilder()
-                .login("   ")
-                .build();
+        User user2 = new User();
+        user.setLogin("   ");
         Assertions.assertThrows(ValidationException.class, () -> userService.createUser(user2));
 
     }
 
     @Test
     public void validation_shouldValidateByBirthday() {
-        User user = User.builder()
-                .name("Имя")
-                .email("example@mail.com")
-                .birthday(LocalDate.of(2025, 12, 20))
-                .login("Login")
-                .build();
+        User user = new User();
+        user.setName("Имя");
+        user.setEmail("example@mail.com");
+        user.setBirthday(LocalDate.of(2025, 12, 20));
+        user.setLogin("Login");
         Assertions.assertThrows(ValidationException.class, () -> userService.createUser(user));
 
 

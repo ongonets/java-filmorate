@@ -1,12 +1,15 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @Component
+@Qualifier("inMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users;
 
@@ -43,7 +46,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(long id, long friendId) {
+    public void addFriend(long id, long friendId, long statusID) {
         User user = users.get(id);
         Set<Long> friendSet;
         if (user.getFriends() == null) {
@@ -75,6 +78,11 @@ public class InMemoryUserStorage implements UserStorage {
         }
         friendSet.remove(friendId);
         user.setFriends(friendSet);
+    }
+
+    @Override
+    public void updateFriend(long id, long friendId, long statusId) {
+
     }
 
     @Override
